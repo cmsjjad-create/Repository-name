@@ -1,201 +1,147 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>سينمانا | منصة الأفلام والمسلسلات</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #0b0e14;
-      --card-bg: #151922;
-      --accent-color: #e50914;
-      --text-main: #ffffff;
-      --text-sub: #a0a6b1;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-    nav { background: #121620; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    .logo { font-size: 24px; font-weight: bold; color: var(--accent-color); display: flex; align-items: center; gap: 8px; }
-    .nav-links { display: flex; gap: 15px; align-items: center; }
-    .nav-btn { background: #222834; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-size: 14px; transition: 0.3s; }
-    .nav-btn.admin { background: var(--accent-color); font-weight: bold; }
-    .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-    .section-title { font-size: 22px; margin-bottom: 15px; border-right: 4px solid var(--accent-color); padding-right: 10px; }
-    .search-bar { width: 100%; padding: 12px 20px; border-radius: 8px; border: 1px solid #2a3140; background: #151922; color: white; font-size: 16px; margin-bottom: 20px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-    .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s; }
-    .card:hover { transform: translateY(-5px); }
-    .card img { width: 100%; height: 230px; object-fit: cover; }
-    .card-info { padding: 10px; }
-    .card-title { font-size: 14px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-meta { font-size: 12px; color: var(--text-sub); display: flex; justify-content: space-between; margin-top: 5px; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
-    .modal-content { max-width: 800px; margin: 40px auto; background: var(--card-bg); border-radius: 10px; padding: 20px; position: relative; }
-    .close-btn { position: absolute; left: 15px; top: 15px; font-size: 24px; cursor: pointer; color: #fff; }
-    .player-container { position: relative; width: 100%; height: 400px; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 15px; }
-    iframe { width: 100%; height: 100%; border: none; }
-    .ad-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
-    .skip-btn { margin-top: 15px; padding: 10px 20px; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-    .admin-panel, .download-panel { display: none; background: var(--card-bg); padding: 25px; border-radius: 10px; margin-top: 20px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-size: 14px; }
-    .form-group input { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #2a3140; background: #0b0e14; color: white; }
-    .btn { padding: 10px 20px; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سينمانا - Cinemana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* هيدر شريط الملاحة */
+        header {
+            background-color: #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* حاوية مشغل الفيديو */
+        .player-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 10px;
+            flex: 1;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* نسبة العرض إلى الارتفاع 16:9 */
+            height: 0;
+            background-color: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .iframe-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: cover;
+        }
+
+        /* أزرار التحكم السريعة */
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1e293b;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+
+        .btn-fullscreen {
+            background-color: #ef4444;
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-fullscreen:hover {
+            background-color: #dc2626;
+        }
+    </style>
 </head>
 <body>
 
-  <nav>
-    <div class="logo"><i class="fas fa-film"></i> سينمانا</div>
-    <div class="nav-links">
-      <button class="nav-btn" onclick="showSection('home')">الرئيسية</button>
-      <button class="nav-btn" onclick="showSection('download')"><i class="fas fa-download"></i> التطبيق</button>
-      <button class="nav-btn admin" onclick="showSection('admin')">لوحة التحكم</button>
-    </div>
-  </nav>
+    <header>
+        <div class="logo">🎬 سينمانا</div>
+    </header>
 
-  <div class="container" id="home-section">
-    <input type="text" id="search-input" class="search-bar" placeholder="ابحث عن فيلم أو مسلسل..." oninput="searchMovies()">
-    <h2 class="section-title">أحدث الأفلام والمسلسلات</h2>
-    <div class="grid" id="movies-grid"></div>
-  </div>
-
-  <div class="container download-panel" id="download-section">
-    <h2>تحميل تطبيق سينمانا للهواتف</h2>
-    <p style="margin: 15px 0; color: var(--text-sub);">احصل على تجربة مشاهدة أسرع وأفضل على هاتفك المحمول مباشرة.</p>
-    <a href="#" id="apk-download-btn" class="btn" style="display: inline-block; text-decoration: none;" download><i class="fab fa-android"></i> تحميل ملف APK المباشر</a>
-  </div>
-
-  <div class="container admin-panel" id="admin-section">
-    <h2>لوحة تحكم المشرف</h2>
-    <div style="margin-top: 20px;">
-      <div class="form-group">
-        <label>مفتاح TMDB API Key الخاص بك:</label>
-        <input type="text" id="tmdb-key-input" value="ae837cdd3522cdaa46c402c5808ab020">
-      </div>
-      <button class="btn" onclick="saveApiKey()">حفظ واختبار الاتصال</button>
-      <hr style="margin: 20px 0; border-color: #2a3140;">
-      <div class="form-group">
-        <label>رابط تحميل تطبيق APK المباشر:</label>
-        <input type="text" id="apk-url-input" placeholder="https://example.com/app.apk">
-      </div>
-      <button class="btn" onclick="saveApkUrl()">حفظ رابط التطبيق</button>
-    </div>
-  </div>
-
-  <div class="modal" id="player-modal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closePlayer()">&times;</span>
-      <h3 id="modal-title" style="margin-bottom: 15px;"></h3>
-      <div class="player-container">
-        <div class="ad-overlay" id="ad-overlay">
-          <h4>إعلان ترويجي</h4>
-          <p>سيبدأ عرض الفيلم بعد انتهاء الإعلان</p>
-          <button class="skip-btn" id="skip-btn" onclick="skipAd()" disabled>تخطي الإعلان (5)</button>
+    <div class="player-container">
+        <div class="iframe-wrapper" id="videoWrapper">
+            <!-- خاصية sandbox تمنع فتح النوافذ المنبثقة والإعلانات والتوجيه المزعج -->
+            <iframe 
+                id="mainPlayer"
+                src="ضع_رابط_سيرفر_الفيديو_هنا" 
+                title="مشغل سينمانا"
+                sandbox="allow-scripts allow-same-origin allow-forms"
+                allow="fullscreen; autoplay; picture-in-picture"
+                allowfullscreen="true"
+                webkitallowfullscreen="true"
+                mozallowfullscreen="true">
+            </iframe>
         </div>
-        <iframe id="video-frame" src="" allowfullscreen></iframe>
-      </div>
-      <p id="modal-overview" style="color: var(--text-sub); font-size: 14px;"></p>
+
+        <div class="controls">
+            <span>عرض الفيديو</span>
+            <button class="btn-fullscreen" onclick="openFullscreen()">🖥️ ملء الشاشة</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    let apiKey = "ae837cdd3522cdaa46c402c5808ab020";
-    let apkUrl = "#";
-
-    function showSection(section) {
-      document.getElementById('home-section').style.display = section === 'home' ? 'block' : 'none';
-      document.getElementById('download-section').style.display = section === 'download' ? 'block' : 'none';
-      document.getElementById('admin-section').style.display = section === 'admin' ? 'block' : 'none';
-    }
-
-    async function fetchPopularMovies() {
-      try {
-        const res = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ar-SA`);
-        const data = await res.json();
-        displayMovies(data.results);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    function displayMovies(movies) {
-      const grid = document.getElementById('movies-grid');
-      grid.innerHTML = '';
-      movies.forEach(m => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.onclick = () => openPlayer(m.id, m.title || m.name, m.overview);
-        card.innerHTML = `
-          <img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w500' + m.poster_path : 'https://via.placeholder.com/500x750'}" alt="${m.title}">
-          <div class="card-info">
-            <div class="card-title">${m.title || m.name}</div>
-            <div class="card-meta">
-              <span><i class="fas fa-star" style="color: #f1c40f;"></i> ${m.vote_average}</span>
-              <span>${(m.release_date || '').split('-')[0]}</span>
-            </div>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    async function searchMovies() {
-      const q = document.getElementById('search-input').value;
-      if (!q) return fetchPopularMovies();
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(q)}&language=ar-SA`);
-      const data = await res.json();
-      displayMovies(data.results);
-    }
-
-    function openPlayer(id, title, overview) {
-      document.getElementById('modal-title').innerText = title;
-      document.getElementById('modal-overview').innerText = overview;
-      document.getElementById('video-frame').src = `https://vidsrc.to/embed/movie/${id}`;
-      document.getElementById('player-modal').style.display = 'block';
-      
-      const adOverlay = document.getElementById('ad-overlay');
-      const skipBtn = document.getElementById('skip-btn');
-      adOverlay.style.display = 'flex';
-      let timer = 5;
-      skipBtn.disabled = true;
-      skipBtn.innerText = `تخطي الإعلان (${timer})`;
-      
-      const interval = setInterval(() => {
-        timer--;
-        if (timer > 0) {
-          skipBtn.innerText = `تخطي الإعلان (${timer})`;
-        } else {
-          clearInterval(interval);
-          skipBtn.disabled = false;
-          skipBtn.innerText = "تخطي الإعلان الآن";
+    <script>
+        // دالة تفعيل ملء الشاشة بضغطة زر للجوال والكمبيوتر
+        function openFullscreen() {
+            const elem = document.getElementById("videoWrapper");
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari / iOS */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
         }
-      }, 1000);
-    }
 
-    function skipAd() {
-      document.getElementById('ad-overlay').style.display = 'none';
-    }
-
-    function closePlayer() {
-      document.getElementById('player-modal').style.display = 'none';
-      document.getElementById('video-frame').src = '';
-    }
-
-    function saveApiKey() {
-      apiKey = document.getElementById('tmdb-key-input').value;
-      alert("تم حفظ المفتاح بنجاح!");
-      fetchPopularMovies();
-    }
-
-    function saveApkUrl() {
-      apkUrl = document.getElementById('apk-url-input').value;
-      document.getElementById('apk-download-btn').href = apkUrl;
-      alert("تم حفظ رابط التطبيق بنجاح!");
-    }
-
-    fetchPopularMovies();
-  </script>
+        // حماية إضافية لمنع السكربتات الخبيثة والإعلانات من فتح صفحات جديدة
+        window.onbeforeunload = function() {
+            // يمنع التوجيه التلقائي المزعج
+        };
+    </script>
 </body>
 </html>
+
