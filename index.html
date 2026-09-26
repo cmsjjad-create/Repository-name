@@ -52,7 +52,7 @@
             padding: 0 20px;
         }
 
-        /* حاوية مشغل الفيديو عند الاختيار */
+        /* حاوية مشغل الفيديو */
         #playerSection {
             display: none;
             margin-bottom: 30px;
@@ -125,14 +125,25 @@
             transform: translateY(-5px);
         }
 
-        .card img {
+        .poster-box {
             width: 100%;
-            height: 240px;
-            object-fit: cover;
+            height: 230px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #e2e8f0;
+        }
+
+        .poster-box i {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 10px;
         }
 
         .card-info {
-            padding: 10px;
+            padding: 12px;
         }
 
         .card-title {
@@ -163,7 +174,7 @@
     </nav>
 
     <div class="container">
-        <!-- منطقة المشغل المدمج مع حظر الإعلانات وتكبير الشاشة -->
+        <!-- منطقة المشغل -->
         <div id="playerSection">
             <div class="video-wrapper" id="videoBox">
                 <iframe id="videoIframe" src="" sandbox="allow-scripts allow-same-origin allow-forms" allowfullscreen></iframe>
@@ -176,9 +187,13 @@
 
         <h2 class="section-title">أحدث الأفلام والمسلسلات</h2>
         <div class="grid" id="moviesGrid">
-            <!-- كارت سبايدرمان -->
+            
+            <!-- الفيلم الأول -->
             <div class="card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'سبايدرمان: يوم جديد')">
-                <img src="https://image.tmdb.org/t/p/w500/1g0dhY242yAA6qM2sA4x0Q718mH.jpg" alt="سبايدرمان">
+                <div class="poster-box">
+                    <i class="fas fa-mask"></i>
+                    <span>سبايدرمان</span>
+                </div>
                 <div class="card-info">
                     <div class="card-title">سبايدرمان: يوم جديد</div>
                     <div class="card-meta">
@@ -188,9 +203,12 @@
                 </div>
             </div>
 
-            <!-- كارت الشر المقيم -->
+            <!-- الفيلم الثاني -->
             <div class="card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'الشر المقيم')">
-                <img src="https://image.tmdb.org/t/p/w500/7WsyChLLEz331C3y9A2y3s218mH.jpg" alt="الشر المقيم">
+                <div class="poster-box">
+                    <i class="fas fa-biohazard"></i>
+                    <span>الشر المقيم</span>
+                </div>
                 <div class="card-info">
                     <div class="card-title">الشر المقيم</div>
                     <div class="card-meta">
@@ -199,6 +217,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -226,4 +245,4 @@
         }
     </script>
 </body>
-</html
+</html>
