@@ -3,59 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سينمانا | منصة الأفلام والمسلسلات</title>
+    <title>سينمانا - شبكتي | Cinemana</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0b0e14;
-            --card-bg: #151922;
-            --accent: #e50914;
+            --bg-dark: #0f141e;
+            --card-bg: #181e2a;
+            --cinemana-red: #e50914;
+            --cinemana-yellow: #ffb400;
             --text-main: #ffffff;
-            --text-sub: #a0aec0;
+            --text-sub: #94a3b8;
+            --border-color: #232d3f;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 40px;
+            padding-bottom: 50px;
         }
 
-        nav {
-            background: #121620;
-            padding: 15px 5%;
+        /* شريط الملاحة الشبيه بسينمانا */
+        header {
+            background: #131924;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 20px;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #1f2430;
+            justify-content: space-between;
+            gap: 15px;
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--accent);
+        .brand {
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--cinemana-red);
+            text-decoration: none;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: #1c2433;
+            border: 1px solid var(--border-color);
+            padding: 8px 35px 8px 15px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-sub);
+        }
+
+        nav.menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        nav.menu a {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        nav.menu a.active, nav.menu a:hover {
+            color: #fff;
         }
 
         .container {
             max-width: 1200px;
             margin: 20px auto;
-            padding: 0 20px;
+            padding: 0 15px;
         }
 
-        /* حاوية مشغل الفيديو */
+        /* مشغل الفيديو الشبيه بسينمانا */
         #playerSection {
             display: none;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .video-wrapper {
@@ -63,9 +122,6 @@
             padding-bottom: 56.25%;
             height: 0;
             background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .video-wrapper iframe {
@@ -77,143 +133,235 @@
             border: none;
         }
 
-        .player-tools {
+        .player-bar {
+            padding: 12px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #151922;
-            padding: 12px 20px;
-            margin-top: 10px;
-            border-radius: 8px;
+            background: #121722;
+        }
+
+        .player-title {
+            font-weight: bold;
+            font-size: 15px;
         }
 
         .btn-fullscreen {
-            background: var(--accent);
+            background: var(--cinemana-red);
             color: #fff;
             border: none;
-            padding: 8px 16px;
+            padding: 7px 14px;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 13px;
             font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            border-right: 4px solid var(--accent);
+        /* عنوان الأقسام */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0 15px 0;
+            border-right: 4px solid var(--cinemana-red);
             padding-right: 10px;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
         }
 
-        .card {
+        /* شبكة العرض (Grid) */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        /* بطاقات الأفلام والمسلسلات */
+        .movie-card {
             background: var(--card-bg);
             border-radius: 10px;
             overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
-            transition: transform 0.2s;
+            position: relative;
         }
 
-        .card:hover {
+        .movie-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
-        .poster-box {
+        .poster-container {
             width: 100%;
-            height: 230px;
-            background: #1e293b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: #e2e8f0;
+            padding-top: 145%;
+            position: relative;
+            background: #232d3f;
         }
 
-        .poster-box i {
-            font-size: 48px;
-            color: var(--accent);
-            margin-bottom: 10px;
+        .poster-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .card-info {
-            padding: 12px;
-        }
-
-        .card-title {
-            font-size: 14px;
+        .badge-quality {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+            font-size: 10px;
             font-weight: bold;
+            padding: 3px 6px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        .movie-info {
+            padding: 10px;
+        }
+
+        .movie-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-bottom: 4px;
         }
 
-        .card-meta {
+        .movie-meta {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            color: #a0aec0;
-            margin-top: 5px;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-sub);
         }
 
         .rating {
-            color: #f6e05e;
+            color: var(--cinemana-yellow);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo"><i class="fas fa-film"></i> سينمانا</div>
-    </nav>
+    <!-- الهيدر الرئيسي -->
+    <header>
+        <div class="header-container">
+            <a href="#" class="brand">
+                <i class="fas fa-play-circle"></i> سينمانا
+            </a>
+            
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="ابحث عن فيلم أو مسلسل...">
+            </div>
+
+            <nav class="menu">
+                <a href="#" class="active">الرئيسية</a>
+                <a href="#">الأفلام</a>
+                <a href="#">المسلسلات</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <!-- منطقة المشغل -->
+
+        <!-- مشغل الفيديو -->
         <div id="playerSection">
             <div class="video-wrapper" id="videoBox">
                 <iframe id="videoIframe" src="" sandbox="allow-scripts allow-same-origin allow-forms" allowfullscreen></iframe>
             </div>
-            <div class="player-tools">
-                <span id="playingTitle">جاري التشغيل...</span>
-                <button class="btn-fullscreen" onclick="goFullscreen()"><i class="fas fa-expand"></i> ملء الشاشة</button>
+            <div class="player-bar">
+                <span class="player-title" id="playingTitle">اسم الفيلم</span>
+                <button class="btn-fullscreen" onclick="goFullscreen()">
+                    <i class="fas fa-expand"></i> ملء الشاشة
+                </button>
             </div>
         </div>
 
-        <h2 class="section-title">أحدث الأفلام والمسلسلات</h2>
-        <div class="grid" id="moviesGrid">
+        <!-- قسم الأحدث -->
+        <div class="section-header">
+            <h2 class="section-title">أحدث المضاف حديثاً</h2>
+        </div>
+
+        <div class="movies-grid">
             
-            <!-- الفيلم الأول -->
-            <div class="card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'سبايدرمان: يوم جديد')">
-                <div class="poster-box">
-                    <i class="fas fa-mask"></i>
-                    <span>سبايدرمان</span>
+            <!-- فيلم 1 -->
+            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'سبايدرمان: يوم جديد (2026)')">
+                <div class="poster-container">
+                    <span class="badge-quality">FHD</span>
+                    <img src="https://picsum.photos/id/1018/300/430" alt="سبايدرمان">
                 </div>
-                <div class="card-info">
-                    <div class="card-title">سبايدرمان: يوم جديد</div>
-                    <div class="card-meta">
+                <div class="movie-info">
+                    <div class="movie-title">سبايدرمان: يوم جديد</div>
+                    <div class="movie-meta">
                         <span>2026</span>
                         <span class="rating"><i class="fas fa-star"></i> 7.8</span>
                     </div>
                 </div>
             </div>
 
-            <!-- الفيلم الثاني -->
-            <div class="card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'الشر المقيم')">
-                <div class="poster-box">
-                    <i class="fas fa-biohazard"></i>
-                    <span>الشر المقيم</span>
+            <!-- فيلم 2 -->
+            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'الشر المقيم (2026)')">
+                <div class="poster-container">
+                    <span class="badge-quality">4K</span>
+                    <img src="https://picsum.photos/id/1015/300/430" alt="الشر المقيم">
                 </div>
-                <div class="card-info">
-                    <div class="card-title">الشر المقيم</div>
-                    <div class="card-meta">
+                <div class="movie-info">
+                    <div class="movie-title">الشر المقيم</div>
+                    <div class="movie-meta">
                         <span>2026</span>
                         <span class="rating"><i class="fas fa-star"></i> 7.3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- فيلم 3 -->
+            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'باتمان: الظلام')">
+                <div class="poster-container">
+                    <span class="badge-quality">FHD</span>
+                    <img src="https://picsum.photos/id/1019/300/430" alt="باتمان">
+                </div>
+                <div class="movie-info">
+                    <div class="movie-title">باتمان: عودة الظلام</div>
+                    <div class="movie-meta">
+                        <span>2025</span>
+                        <span class="rating"><i class="fas fa-star"></i> 8.5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- فيلم 4 -->
+            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'مهمة مستحيلة')">
+                <div class="poster-container">
+                    <span class="badge-quality">WEB-DL</span>
+                    <img src="https://picsum.photos/id/1022/300/430" alt="مهمة مستحيلة">
+                </div>
+                <div class="movie-info">
+                    <div class="movie-title">مهمة مستحيلة</div>
+                    <div class="movie-meta">
+                        <span>2025</span>
+                        <span class="rating"><i class="fas fa-star"></i> 8.1</span>
                     </div>
                 </div>
             </div>
