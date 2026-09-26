@@ -1,495 +1,119 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HiTV - هاي تي في</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Plyr CSS -->
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <style>
-        :root {
-            --hitv-bg: #0b0c0e;
-            --hitv-card: #15171c;
-            --hitv-orange: #ff6b00;
-            --hitv-yellow: #ffb400;
-            --hitv-text: #ffffff;
-            --hitv-subtext: #828a99;
-            --hitv-border: #22262e;
-        }
+<!-- كود CSS للتصميم المطابق -->
+<style>
+  /* حاوية الشبكة (Grid) */
+  .hitv-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 10px;
+    background-color: #0b0c0e; /* خلفية داكنة جداً مطابقة للموقع */
+    direction: rtl;
+  }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+  /* بطاقة الفيلم/المسلسل */
+  .hitv-card {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
 
-        body {
-            background-color: var(--hitv-bg);
-            color: var(--hitv-text);
-            padding-bottom: 40px;
-        }
+  /* حاوية الصورة/البوستر */
+  .poster-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4; /* أبعاد البوستر القياسية */
+    border-radius: 14px; /* زوايا منحنية بالكامل */
+    overflow: hidden;
+    background-color: #1a1c23;
+  }
 
-        header {
-            background: #111317;
-            border-bottom: 1px solid var(--hitv-border);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            padding: 10px 16px;
-        }
+  .poster-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 
-        .header-container {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
+  /* شارة التقييم (أسفل يسار الصورة) */
+  .rating-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    direction: ltr; /* لضمان ظهور النجمة على اليمين/اليسار بشكل صحيح */
+  }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 22px;
-            font-weight: 900;
-            color: var(--hitv-orange);
-            cursor: pointer;
-            letter-spacing: -0.5px;
-        }
+  .rating-badge i {
+    color: #ffb400; /* لون النجمة الذهبي/الأصفر */
+    font-size: 10px;
+  }
 
-        .brand span {
-            color: #fff;
-        }
+  /* معلومات العمل تحت الصورة */
+  .card-info {
+    padding: 8px 4px 4px 4px;
+    text-align: right;
+  }
 
-        .search-box {
-            flex: 1;
-            max-width: 240px;
-            position: relative;
-        }
+  .card-title {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-        .search-box input {
-            width: 100%;
-            background: #1c1f26;
-            border: 1px solid var(--hitv-border);
-            padding: 7px 32px 7px 10px;
-            border-radius: 16px;
-            color: #fff;
-            font-size: 12px;
-            outline: none;
-        }
+  .card-meta {
+    color: #828a99;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
 
-        .search-box i {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--hitv-subtext);
-            font-size: 12px;
-        }
+<!-- هيكل بطاقات HTML -->
+<div class="hitv-grid">
 
-        .categories-bar {
-            display: flex;
-            gap: 15px;
-            padding: 12px 16px;
-            overflow-x: auto;
-            white-space: nowrap;
-            max-width: 800px;
-            margin: 0 auto;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .categories-bar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .cat-item {
-            font-size: 13px;
-            color: var(--hitv-subtext);
-            font-weight: 600;
-            cursor: pointer;
-            padding-bottom: 4px;
-            position: relative;
-        }
-
-        .cat-item.active {
-            color: #fff;
-        }
-
-        .cat-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            height: 2px;
-            background: var(--hitv-orange);
-            border-radius: 2px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 15px auto;
-            padding: 0 12px;
-        }
-
-        #mediaDetailView {
-            display: none;
-            background: var(--hitv-card);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--hitv-border);
-            margin-bottom: 20px;
-        }
-
-        .player-wrapper {
-            width: 100%;
-            background: #000;
-        }
-
-        .detail-content {
-            padding: 15px;
-        }
-
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .detail-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--hitv-subtext);
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .detail-tags {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 11px;
-            color: var(--hitv-subtext);
-            margin-bottom: 12px;
-        }
-
-        .tag-badge {
-            background: rgba(255, 107, 0, 0.15);
-            color: var(--hitv-orange);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .detail-desc {
-            font-size: 12px;
-            color: #b0b8c4;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .section-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .section-title span {
-            color: var(--hitv-orange);
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .hitv-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        @media (min-width: 500px) {
-            .hitv-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
-            }
-        }
-
-        .hitv-card {
-            background: var(--hitv-card);
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-            border: 1px solid var(--hitv-border);
-            transition: transform 0.2s;
-        }
-
-        .hitv-card:active {
-            transform: scale(0.96);
-        }
-
-        .poster-box {
-            width: 100%;
-            padding-top: 135%;
-            position: relative;
-            background: #1c1f26;
-        }
-
-        .poster-box img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .hitv-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: var(--hitv-orange);
-            color: #fff;
-            font-size: 8px;
-            font-weight: 800;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        .hitv-rating {
-            position: absolute;
-            bottom: 6px;
-            left: 6px;
-            background: rgba(0,0,0,0.75);
-            color: var(--hitv-yellow);
-            font-size: 9px;
-            font-weight: bold;
-            padding: 2px 4px;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .card-info {
-            padding: 6px 8px;
-        }
-
-        .card-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-sub {
-            font-size: 9px;
-            color: var(--hitv-subtext);
-            margin-top: 2px;
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="header-container">
-            <div class="brand" onclick="closeDetails()">
-                HiTV <span>عربي</span>
-            </div>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="بحث في HiTV..." onkeyup="handleSearch(event)">
-            </div>
-        </div>
-    </header>
-
-    <div class="categories-bar">
-        <div class="cat-item active" onclick="filterCat('all', this)">الكل</div>
-        <div class="cat-item" onclick="filterCat('kdrama', this)">دراما كورية</div>
-        <div class="cat-item" onclick="filterCat('movies', this)">الأفلام</div>
-        <div class="cat-item" onclick="filterCat('anime', this)">أنيميشن</div>
+  <!-- العنصر الأول -->
+  <div class="hitv-card">
+    <div class="poster-container">
+      <img src="https://picsum.photos/id/1018/300/400" alt="صائد الساحرات">
+      <div class="rating-badge">
+        <i class="fas fa-star"></i> 8.8
+      </div>
     </div>
-
-    <div class="container">
-
-        <div id="mediaDetailView">
-            <div class="player-wrapper">
-                <video id="player" playsinline controls></video>
-            </div>
-            <div class="detail-content">
-                <div class="detail-header">
-                    <div class="detail-title" id="dTitle">عنوان الفيلم</div>
-                    <button class="close-btn" onclick="closeDetails()"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="detail-tags">
-                    <span class="tag-badge">HD 1080p</span>
-                    <span id="dRating"><i class="fas fa-star" style="color:var(--hitv-yellow);"></i> 8.5</span>
-                    <span id="dYear">2024</span>
-                    <span id="dCategory">دراما</span>
-                </div>
-                <div class="detail-desc" id="dOverview">
-                    تفاصيل وقصة العرض تظهر هنا بدقة عالية مع خيارات المشاهدة بدون إعلانات.
-                </div>
-            </div>
-        </div>
-
-        <div class="section-title">
-            <span>الأكثر مشاهدة على HiTV</span>
-        </div>
-
-        <div class="hitv-grid" id="hitvGrid"></div>
-
+    <div class="card-info">
+      <div class="card-title">صائد الساحرات</div>
+      <div class="card-meta">2021 • أكشن • فانتازيا</div>
     </div>
+  </div>
 
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+  <!-- العنصر الثاني -->
+  <div class="hitv-card">
+    <div class="poster-container">
+      <img src="https://picsum.photos/id/1015/300/400" alt="دموع من فولاذ">
+      <div class="rating-badge">
+        <i class="fas fa-star"></i> 9.1
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-title">دموع من فولاذ</div>
+      <div class="card-meta">2022 • خيال علمي • دراما</div>
+    </div>
+  </div>
 
-    <script>
-        let plyrInstance = null;
-
-        const hitvData = [
-            {
-                id: 1,
-                title: 'صائد الساحرات',
-                category: 'movies',
-                categoryName: 'أكشن • فانتازيا',
-                year: '2021',
-                rating: '8.8',
-                overview: 'رحلة أسطورية يخوضها البطل للانتقام والتغلب على قوى الظلام في عالم مليء بالتحديات.',
-                poster: 'https://picsum.photos/id/1018/300/400',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
-            },
-            {
-                id: 2,
-                title: 'دموع من فولاذ',
-                category: 'kdrama',
-                categoryName: 'خيال علمي • دراما',
-                year: '2022',
-                rating: '9.1',
-                overview: 'مجموعة من العلماء والفرسان يحاولون إعادة بناء العالم المستقبلي وسط صراعات حادة.',
-                poster: 'https://picsum.photos/id/1015/300/400',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
-            },
-            {
-                id: 3,
-                title: 'مغامرة الأرنب',
-                category: 'anime',
-                categoryName: 'أنيميشن • كوميدي',
-                year: '2023',
-                rating: '8.4',
-                overview: 'مغامرة عائلية لطيفة ومسلية تجمع بين المرح والدراما الممتعة لجميع الأعمار.',
-                poster: 'https://picsum.photos/id/1025/300/400',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-            },
-            {
-                id: 4,
-                title: 'البحث عن النجوم',
-                category: 'movies',
-                categoryName: 'مغامرة • فضائي',
-                year: '2024',
-                rating: '8.9',
-                overview: 'رحلة استكشافية فريدة تنطلق بين المجرات البعيدة لكشف أسرار لم تُعرف من قبل.',
-                poster: 'https://picsum.photos/id/1039/300/400',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
-            }
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            plyrInstance = new Plyr('#player', {
-                i18n: { play: 'تشغيل', pause: 'إيقاف', fullscreen: 'ملء الشاشة' }
-            });
-            renderGrid(hitvData);
-        });
-
-        function renderGrid(list) {
-            const grid = document.getElementById('hitvGrid');
-            grid.innerHTML = '';
-
-            list.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'hitv-card';
-                card.onclick = () => openHiTVMedia(item);
-
-                card.innerHTML = `
-                    <div class="poster-box">
-                        <span class="hitv-badge">HiTV</span>
-                        <img src="${item.poster}" alt="${item.title}">
-                        <div class="hitv-rating">
-                            <i class="fas fa-star"></i> ${item.rating}
-                        </div>
-                    </div>
-                    <div class="card-info">
-                        <div class="card-title">${item.title}</div>
-                        <div class="card-sub">${item.year} • ${item.categoryName}</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function openHiTVMedia(item) {
-            const detailView = document.getElementById('mediaDetailView');
-            
-            document.getElementById('dTitle').innerText = item.title;
-            document.getElementById('dRating').innerHTML = `<i class="fas fa-star" style="color:var(--hitv-yellow);"></i> ${item.rating}`;
-            document.getElementById('dYear').innerText = item.year;
-            document.getElementById('dCategory').innerText = item.categoryName;
-            document.getElementById('dOverview').innerText = item.overview;
-
-            plyrInstance.source = {
-                type: 'video',
-                title: item.title,
-                sources: [{ src: item.videoUrl, type: 'video/mp4' }],
-                poster: item.poster
-            };
-
-            detailView.style.display = 'block';
-            detailView.scrollIntoView({ behavior: 'smooth' });
-            plyrInstance.play();
-        }
-
-        function closeDetails() {
-            const detailView = document.getElementById('mediaDetailView');
-            plyrInstance.stop();
-            detailView.style.display = 'none';
-        }
-
-        function filterCat(cat, el) {
-            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-
-            if (cat === 'all') {
-                renderGrid(hitvData);
-            } else {
-                const filtered = hitvData.filter(m => m.category === cat);
-                renderGrid(filtered);
-            }
-        }
-
-        function handleSearch(e) {
-            const q = e.target.value.trim().toLowerCase();
-            if(!q) {
-                renderGrid(hitvData);
-                return;
-            }
-            const res = hitvData.filter(m => m.title.toLowerCase().includes(q));
-            renderGrid(res);
-        }
-    </script>
-</body>
-</html>
+</div>
