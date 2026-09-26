@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سينمانا - Cinemana</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
         :root {
             --bg-dark: #0d1117;
@@ -30,7 +32,6 @@
             padding-bottom: 50px;
         }
 
-        /* الهيدر على طريقة سينمانا */
         header {
             background: #121721;
             border-bottom: 1px solid var(--border-color);
@@ -57,7 +58,6 @@
             font-size: 22px;
             font-weight: 800;
             color: var(--cinemana-red);
-            text-decoration: none;
             cursor: pointer;
         }
 
@@ -86,13 +86,13 @@
             color: var(--text-sub);
         }
 
-        /* المشغل السينمائي */
         .container {
             max-width: 1200px;
             margin: 20px auto;
             padding: 0 15px;
         }
 
+        /* المشغل في الأعلى */
         #playerSection {
             display: none;
             margin-bottom: 25px;
@@ -101,22 +101,6 @@
             overflow: hidden;
             border: 1px solid var(--border-color);
             box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-        }
-
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            background: #000;
-        }
-
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
         }
 
         .player-bar {
@@ -129,25 +113,10 @@
 
         .player-title {
             font-weight: bold;
-            font-size: 15px;
+            font-size: 16px;
             color: #fff;
         }
 
-        .btn-fullscreen {
-            background: var(--cinemana-red);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* عنوان الأقسام */
         .section-header {
             display: flex;
             align-items: center;
@@ -162,7 +131,6 @@
             font-weight: 700;
         }
 
-        /* شبكة الكروت المتجاوبة */
         .movies-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -183,7 +151,6 @@
             border: 1px solid var(--border-color);
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
-            position: relative;
         }
 
         .movie-card:hover {
@@ -257,7 +224,6 @@
 </head>
 <body>
 
-    <!-- الهيدر والبحث -->
     <header>
         <div class="header-container">
             <div class="brand" onclick="loadTrendingMovies()">
@@ -266,61 +232,77 @@
             
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="ابحث عن اسم فيلم أو مسلسل..." onkeyup="handleSearch(event)">
+                <input type="text" id="searchInput" placeholder="ابحث عن اسم فيلم..." onkeyup="handleSearch(event)">
             </div>
         </div>
     </header>
 
     <div class="container">
 
-        <!-- مشغل الفيديو سينمانا -->
+        <!-- مشغل Plyr في أصل الصفحة -->
         <div id="playerSection">
-            <div class="video-wrapper" id="videoBox">
-                <iframe id="videoIframe" src="" allowfullscreen></iframe>
-            </div>
             <div class="player-bar">
-                <span class="player-title" id="playingTitle">اسم الفيلم</span>
-                <button class="btn-fullscreen" onclick="goFullscreen()">
-                    <i class="fas fa-expand"></i> ملء الشاشة
-                </button>
+                <span class="player-title" id="playingTitle">عنوان الفيلم</span>
+            </div>
+            <div id="mediaContainer">
+                <video id="player" playsinline controls>
+                    <source id="videoSource" src="" type="video/mp4" />
+                </video>
             </div>
         </div>
 
-        <!-- الأقسام والشبكة -->
         <div class="section-header">
             <h2 class="section-title" id="gridTitle">أحدث الأفلام والمسلسلات</h2>
         </div>
 
         <div class="movies-grid" id="moviesGrid">
-            <div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل مكتبة الأفلام...</div>
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل الأفلام...</div>
         </div>
 
     </div>
 
-    <script>
-        const API_KEY = 'e2b3e8e19e1208947d6e6f4a8cb87c2a'; // مفتاح مكتبة الأفلام العالمية TMDb
-        const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
-        // تحميل الأفلام الشائعة عند فتح الموقع
+    <script>
+        const API_KEY = 'e2b3e8e19e1208947d6e6f4a8cb87c2a';
+        const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
+        let plyrInstance = null;
+
         document.addEventListener('DOMContentLoaded', () => {
+            // تهيئة مكتبة Plyr باللغة العربية
+            plyrInstance = new Plyr('#player', {
+                i18n: {
+                    play: 'تشغيل',
+                    pause: 'إيقاف مؤقت',
+                    restart: 'إعادة',
+                    rewind: 'ترجيع',
+                    forward: 'تقديم',
+                    captions: 'الترجمة',
+                    settings: 'الإعدادات',
+                    speed: 'السرعة',
+                    quality: 'الجودة',
+                    fullscreen: 'ملء الشاشة'
+                }
+            });
+
             loadTrendingMovies();
         });
 
         async function loadTrendingMovies() {
             document.getElementById('gridTitle').innerText = 'أحدث الأفلام والمسلسلات';
             const grid = document.getElementById('moviesGrid');
-            grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل مكتبة الأفلام...</div>';
+            grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل الأفلام...</div>';
 
             try {
                 const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=ar-SA`);
                 const data = await res.json();
                 displayMovies(data.results);
             } catch (err) {
-                grid.innerHTML = '<div class="loading">حدث خطأ أثناء تحميل البيانات، يرجى المحاولة لاحقاً.</div>';
+                grid.innerHTML = '<div class="loading">حدث خطأ أثناء تحميل البيانات.</div>';
             }
         }
 
-        // إظهار بطاقات الأفلام
         function displayMovies(movies) {
             const grid = document.getElementById('moviesGrid');
             grid.innerHTML = '';
@@ -338,7 +320,9 @@
 
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => playMovie(movie.id, title);
+                // فيديو افتراضي للتحقق من تشغيل Plyr بنجاح
+                const sampleVideo = 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4';
+                card.onclick = () => playMovie(sampleVideo, title, poster);
 
                 card.innerHTML = `
                     <div class="poster-container">
@@ -357,20 +341,31 @@
             });
         }
 
-        // تشغيل الفيلم عند الضغط عليه عبر سيرفر Embed مجاني وذكي
-        function playMovie(id, title) {
+        // تشغيل الفيلم وتحديد الغلاف والعنوان أعلى الصفحة
+        function playMovie(videoUrl, title, posterUrl) {
             const playerSection = document.getElementById('playerSection');
-            const iframe = document.getElementById('videoIframe');
             const titleElement = document.getElementById('playingTitle');
 
-            // سيرفر تشغيل تلقائي مرتبط بـ TMDb ID
-            iframe.src = `https://vidsrc.to/embed/movie/${id}`;
             titleElement.innerText = title;
+            
+            // تحديث مصدر الفيديو والغلاف في Plyr
+            plyrInstance.source = {
+                type: 'video',
+                title: title,
+                sources: [
+                    {
+                        src: videoUrl,
+                        type: 'video/mp4',
+                    },
+                ],
+                poster: posterUrl
+            };
+
             playerSection.style.display = 'block';
             playerSection.scrollIntoView({ behavior: 'smooth' });
+            plyrInstance.play();
         }
 
-        // البحث الفوري
         let searchTimeout;
         function handleSearch(e) {
             clearTimeout(searchTimeout);
@@ -394,18 +389,6 @@
                     grid.innerHTML = '<div class="loading">حدث خطأ أثناء البحث.</div>';
                 }
             }, 500);
-        }
-
-        // وضع ملء الشاشة
-        function goFullscreen() {
-            const box = document.getElementById('videoBox');
-            if (box.requestFullscreen) {
-                box.requestFullscreen();
-            } else if (box.webkitRequestFullscreen) {
-                box.webkitRequestFullscreen();
-            } else if (box.msRequestFullscreen) {
-                box.msRequestFullscreen();
-            }
         }
     </script>
 </body>
