@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سينمانا - شبكتي | Cinemana</title>
+    <title>سينمانا - Cinemana</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #0f141e;
-            --card-bg: #181e2a;
+            --bg-dark: #0d1117;
+            --card-bg: #161b22;
             --cinemana-red: #e50914;
-            --cinemana-yellow: #ffb400;
+            --accent-yellow: #ffb400;
             --text-main: #ffffff;
-            --text-sub: #94a3b8;
-            --border-color: #232d3f;
+            --text-sub: #8b949e;
+            --border-color: #30363d;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -30,13 +30,13 @@
             padding-bottom: 50px;
         }
 
-        /* شريط الملاحة الشبيه بسينمانا */
+        /* الهيدر على طريقة سينمانا */
         header {
-            background: #131924;
+            background: #121721;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             padding: 12px 20px;
         }
 
@@ -47,16 +47,18 @@
             align-items: center;
             justify-content: space-between;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-size: 22px;
             font-weight: 800;
             color: var(--cinemana-red);
             text-decoration: none;
+            cursor: pointer;
         }
 
         .search-box {
@@ -67,9 +69,9 @@
 
         .search-box input {
             width: 100%;
-            background: #1c2433;
+            background: #1c212c;
             border: 1px solid var(--border-color);
-            padding: 8px 35px 8px 15px;
+            padding: 9px 38px 9px 15px;
             border-radius: 20px;
             color: #fff;
             font-size: 13px;
@@ -78,36 +80,19 @@
 
         .search-box i {
             position: absolute;
-            right: 12px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-sub);
         }
 
-        nav.menu {
-            display: flex;
-            gap: 15px;
-        }
-
-        nav.menu a {
-            color: var(--text-sub);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-
-        nav.menu a.active, nav.menu a:hover {
-            color: #fff;
-        }
-
+        /* المشغل السينمائي */
         .container {
             max-width: 1200px;
             margin: 20px auto;
             padding: 0 15px;
         }
 
-        /* مشغل الفيديو الشبيه بسينمانا */
         #playerSection {
             display: none;
             margin-bottom: 25px;
@@ -115,6 +100,7 @@
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
         }
 
         .video-wrapper {
@@ -138,19 +124,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #121722;
+            background: #121721;
         }
 
         .player-title {
             font-weight: bold;
             font-size: 15px;
+            color: #fff;
         }
 
         .btn-fullscreen {
             background: var(--cinemana-red);
             color: #fff;
             border: none;
-            padding: 7px 14px;
+            padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
@@ -175,7 +162,7 @@
             font-weight: 700;
         }
 
-        /* شبكة العرض (Grid) */
+        /* شبكة الكروت المتجاوبة */
         .movies-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -189,7 +176,6 @@
             }
         }
 
-        /* بطاقات الأفلام والمسلسلات */
         .movie-card {
             background: var(--card-bg);
             border-radius: 10px;
@@ -207,9 +193,9 @@
 
         .poster-container {
             width: 100%;
-            padding-top: 145%;
+            padding-top: 148%;
             position: relative;
-            background: #232d3f;
+            background: #21262d;
         }
 
         .poster-container img {
@@ -231,7 +217,6 @@
             font-weight: bold;
             padding: 3px 6px;
             border-radius: 4px;
-            backdrop-filter: blur(4px);
         }
 
         .movie-info {
@@ -257,39 +242,41 @@
         }
 
         .rating {
-            color: var(--cinemana-yellow);
+            color: var(--accent-yellow);
             font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-sub);
+            font-size: 16px;
+            grid-column: 1 / -1;
         }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر الرئيسي -->
+    <!-- الهيدر والبحث -->
     <header>
         <div class="header-container">
-            <a href="#" class="brand">
+            <div class="brand" onclick="loadTrendingMovies()">
                 <i class="fas fa-play-circle"></i> سينمانا
-            </a>
+            </div>
             
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="ابحث عن فيلم أو مسلسل...">
+                <input type="text" id="searchInput" placeholder="ابحث عن اسم فيلم أو مسلسل..." onkeyup="handleSearch(event)">
             </div>
-
-            <nav class="menu">
-                <a href="#" class="active">الرئيسية</a>
-                <a href="#">الأفلام</a>
-                <a href="#">المسلسلات</a>
-            </nav>
         </div>
     </header>
 
     <div class="container">
 
-        <!-- مشغل الفيديو -->
+        <!-- مشغل الفيديو سينمانا -->
         <div id="playerSection">
             <div class="video-wrapper" id="videoBox">
-                <iframe id="videoIframe" src="" sandbox="allow-scripts allow-same-origin allow-forms" allowfullscreen></iframe>
+                <iframe id="videoIframe" src="" allowfullscreen></iframe>
             </div>
             <div class="player-bar">
                 <span class="player-title" id="playingTitle">اسم الفيلم</span>
@@ -299,88 +286,117 @@
             </div>
         </div>
 
-        <!-- قسم الأحدث -->
+        <!-- الأقسام والشبكة -->
         <div class="section-header">
-            <h2 class="section-title">أحدث المضاف حديثاً</h2>
+            <h2 class="section-title" id="gridTitle">أحدث الأفلام والمسلسلات</h2>
         </div>
 
-        <div class="movies-grid">
-            
-            <!-- فيلم 1 -->
-            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'سبايدرمان: يوم جديد (2026)')">
-                <div class="poster-container">
-                    <span class="badge-quality">FHD</span>
-                    <img src="https://picsum.photos/id/1018/300/430" alt="سبايدرمان">
-                </div>
-                <div class="movie-info">
-                    <div class="movie-title">سبايدرمان: يوم جديد</div>
-                    <div class="movie-meta">
-                        <span>2026</span>
-                        <span class="rating"><i class="fas fa-star"></i> 7.8</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- فيلم 2 -->
-            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'الشر المقيم (2026)')">
-                <div class="poster-container">
-                    <span class="badge-quality">4K</span>
-                    <img src="https://picsum.photos/id/1015/300/430" alt="الشر المقيم">
-                </div>
-                <div class="movie-info">
-                    <div class="movie-title">الشر المقيم</div>
-                    <div class="movie-meta">
-                        <span>2026</span>
-                        <span class="rating"><i class="fas fa-star"></i> 7.3</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- فيلم 3 -->
-            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'باتمان: الظلام')">
-                <div class="poster-container">
-                    <span class="badge-quality">FHD</span>
-                    <img src="https://picsum.photos/id/1019/300/430" alt="باتمان">
-                </div>
-                <div class="movie-info">
-                    <div class="movie-title">باتمان: عودة الظلام</div>
-                    <div class="movie-meta">
-                        <span>2025</span>
-                        <span class="rating"><i class="fas fa-star"></i> 8.5</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- فيلم 4 -->
-            <div class="movie-card" onclick="playVideo('https://www.youtube.com/embed/dQw4w9WgXcQ', 'مهمة مستحيلة')">
-                <div class="poster-container">
-                    <span class="badge-quality">WEB-DL</span>
-                    <img src="https://picsum.photos/id/1022/300/430" alt="مهمة مستحيلة">
-                </div>
-                <div class="movie-info">
-                    <div class="movie-title">مهمة مستحيلة</div>
-                    <div class="movie-meta">
-                        <span>2025</span>
-                        <span class="rating"><i class="fas fa-star"></i> 8.1</span>
-                    </div>
-                </div>
-            </div>
-
+        <div class="movies-grid" id="moviesGrid">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل مكتبة الأفلام...</div>
         </div>
+
     </div>
 
     <script>
-        function playVideo(url, title) {
+        const API_KEY = 'e2b3e8e19e1208947d6e6f4a8cb87c2a'; // مفتاح مكتبة الأفلام العالمية TMDb
+        const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
+
+        // تحميل الأفلام الشائعة عند فتح الموقع
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTrendingMovies();
+        });
+
+        async function loadTrendingMovies() {
+            document.getElementById('gridTitle').innerText = 'أحدث الأفلام والمسلسلات';
+            const grid = document.getElementById('moviesGrid');
+            grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل مكتبة الأفلام...</div>';
+
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=ar-SA`);
+                const data = await res.json();
+                displayMovies(data.results);
+            } catch (err) {
+                grid.innerHTML = '<div class="loading">حدث خطأ أثناء تحميل البيانات، يرجى المحاولة لاحقاً.</div>';
+            }
+        }
+
+        // إظهار بطاقات الأفلام
+        function displayMovies(movies) {
+            const grid = document.getElementById('moviesGrid');
+            grid.innerHTML = '';
+
+            if(!movies || movies.length === 0) {
+                grid.innerHTML = '<div class="loading">لم يتم العثور على أية نتائج.</div>';
+                return;
+            }
+
+            movies.forEach(movie => {
+                const title = movie.title || movie.name || 'بدون عنوان';
+                const releaseDate = (movie.release_date || movie.first_air_date || '').split('-')[0] || 'N/A';
+                const rating = movie.vote_average ? movie.vote_average.toFixed(1) : '7.0';
+                const poster = movie.poster_path ? (IMG_PATH + movie.poster_path) : 'https://via.placeholder.com/300x450/161b22/ffffff?text=بدون+صورة';
+
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.onclick = () => playMovie(movie.id, title);
+
+                card.innerHTML = `
+                    <div class="poster-container">
+                        <span class="badge-quality">FHD</span>
+                        <img src="${poster}" alt="${title}" loading="lazy">
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">${title}</div>
+                        <div class="movie-meta">
+                            <span>${releaseDate}</span>
+                            <span class="rating"><i class="fas fa-star"></i> ${rating}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // تشغيل الفيلم عند الضغط عليه عبر سيرفر Embed مجاني وذكي
+        function playMovie(id, title) {
             const playerSection = document.getElementById('playerSection');
             const iframe = document.getElementById('videoIframe');
             const titleElement = document.getElementById('playingTitle');
-            
-            iframe.src = url;
+
+            // سيرفر تشغيل تلقائي مرتبط بـ TMDb ID
+            iframe.src = `https://vidsrc.to/embed/movie/${id}`;
             titleElement.innerText = title;
             playerSection.style.display = 'block';
             playerSection.scrollIntoView({ behavior: 'smooth' });
         }
 
+        // البحث الفوري
+        let searchTimeout;
+        function handleSearch(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
+
+            if (query.length < 2) {
+                if(query.length === 0) loadTrendingMovies();
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                document.getElementById('gridTitle').innerText = `نتائج البحث عن: ${query}`;
+                const grid = document.getElementById('moviesGrid');
+                grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري البحث...</div>';
+
+                try {
+                    const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&language=ar-SA&query=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+                    displayMovies(data.results);
+                } catch (err) {
+                    grid.innerHTML = '<div class="loading">حدث خطأ أثناء البحث.</div>';
+                }
+            }, 500);
+        }
+
+        // وضع ملء الشاشة
         function goFullscreen() {
             const box = document.getElementById('videoBox');
             if (box.requestFullscreen) {
