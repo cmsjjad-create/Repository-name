@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سينمانا - Cinemana</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
         :root {
             --bg-dark: #0d1117;
@@ -90,7 +92,7 @@
             padding: 0 15px;
         }
 
-        /* المشغل في أعلى الصفحة */
+        /* قسم المشغل في أعلى الصفحة */
         #playerSection {
             display: none;
             margin-bottom: 25px;
@@ -101,28 +103,13 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.7);
         }
 
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%; /* نسبة 16:9 */
-            height: 0;
-            background: #000;
-        }
-
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
         .player-bar {
             padding: 12px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #121721;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .player-title {
@@ -240,7 +227,7 @@
 
     <header>
         <div class="header-container">
-            <div class="brand" onclick="loadTrendingMovies()">
+            <div class="brand" onclick="loadMovies()">
                 <i class="fas fa-play-circle"></i> سينمانا
             </div>
             
@@ -253,13 +240,13 @@
 
     <div class="container">
 
-        <!-- مشغل الفيديو المشغل أعلى الصفحة -->
+        <!-- مشغل الفيديو العلوي -->
         <div id="playerSection">
             <div class="player-bar">
-                <span class="player-title" id="playingTitle">اسم الفيلم</span>
+                <span class="player-title" id="playingTitle">عنوان الفيلم</span>
             </div>
-            <div class="video-wrapper">
-                <iframe id="videoIframe" src="" allowfullscreen allow="autoplay"></iframe>
+            <div id="videoContainer">
+                <video id="player" playsinline controls></video>
             </div>
         </div>
 
@@ -268,62 +255,99 @@
         </div>
 
         <div class="movies-grid" id="moviesGrid">
-            <div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل الأفلام...</div>
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل مكتبة الأفلام...</div>
         </div>
 
     </div>
 
+    <!-- مكتبة Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
     <script>
-        const API_KEY = 'e2b3e8e19e1208947d6e6f4a8cb87c2a';
-        const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
+        let plyrInstance = null;
+
+        // مصفوفة قائمة الأفلام مع روابط الفيديو المباشرة والأغلفة
+        const moviesList = [
+            {
+                id: 1,
+                title: 'صائد الساحرات الأخيرة (Sintel)',
+                year: '2021',
+                rating: '8.5',
+                poster: 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Sintel_poster.jpg',
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
+            },
+            {
+                id: 2,
+                title: 'دموع من فولاذ (Tears of Steel)',
+                year: '2022',
+                rating: '7.9',
+                poster: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Tears_of_Steel_poster.chunk.jpg',
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
+            },
+            {
+                id: 3,
+                title: 'مغامرات الأرنب (Big Buck Bunny)',
+                year: '2023',
+                rating: '8.1',
+                poster: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Big_buck_bunny_poster_big.jpg',
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+            },
+            {
+                id: 4,
+                title: 'رحلة البحث عن النجوم (For Bigger Blazes)',
+                year: '2024',
+                rating: '8.8',
+                poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500',
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+            }
+        ];
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadTrendingMovies();
+            // تهيئة مشغل Plyr باللغة العربية
+            plyrInstance = new Plyr('#player', {
+                i18n: {
+                    play: 'تشغيل',
+                    pause: 'إيقاف مؤقت',
+                    restart: 'إعادة',
+                    rewind: 'ترجيع',
+                    forward: 'تقديم',
+                    captions: 'الترجمة',
+                    settings: 'الإعدادات',
+                    speed: 'السرعة',
+                    quality: 'الجودة',
+                    fullscreen: 'ملء الشاشة'
+                }
+            });
+
+            loadMovies();
         });
 
-        async function loadTrendingMovies() {
-            document.getElementById('gridTitle').innerText = 'أحدث الأفلام والمسلسلات';
-            const grid = document.getElementById('moviesGrid');
-            grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل الأفلام...</div>';
-
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=ar-SA`);
-                const data = await res.json();
-                displayMovies(data.results);
-            } catch (err) {
-                grid.innerHTML = '<div class="loading">حدث خطأ أثناء تحميل البيانات.</div>';
-            }
-        }
-
-        function displayMovies(movies) {
+        function loadMovies(filteredList = null) {
             const grid = document.getElementById('moviesGrid');
             grid.innerHTML = '';
+            
+            const listToDisplay = filteredList || moviesList;
 
-            if(!movies || movies.length === 0) {
-                grid.innerHTML = '<div class="loading">لم يتم العثور على نتائج.</div>';
+            if (listToDisplay.length === 0) {
+                grid.innerHTML = '<div class="loading">لم يتم العثور على أية نتائج.</div>';
                 return;
             }
 
-            movies.forEach(movie => {
-                const title = movie.title || movie.name || 'بدون عنوان';
-                const releaseDate = (movie.release_date || movie.first_air_date || '').split('-')[0] || 'N/A';
-                const rating = movie.vote_average ? movie.vote_average.toFixed(1) : '7.0';
-                const poster = movie.poster_path ? (IMG_PATH + movie.poster_path) : 'https://via.placeholder.com/300x450/161b22/ffffff?text=بدون+صورة';
-
+            listToDisplay.forEach(movie => {
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => playMovie(movie.id, title);
+                card.onclick = () => playMovie(movie.videoUrl, movie.title, movie.poster);
 
                 card.innerHTML = `
                     <div class="poster-container">
                         <span class="badge-quality">FHD</span>
-                        <img src="${poster}" alt="${title}" loading="lazy">
+                        <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
                     </div>
                     <div class="movie-info">
-                        <div class="movie-title">${title}</div>
+                        <div class="movie-title">${movie.title}</div>
                         <div class="movie-meta">
-                            <span>${releaseDate}</span>
-                            <span class="rating"><i class="fas fa-star"></i> ${rating}</span>
+                            <span>${movie.year}</span>
+                            <span class="rating"><i class="fas fa-star"></i> ${movie.rating}</span>
                         </div>
                     </div>
                 `;
@@ -331,43 +355,44 @@
             });
         }
 
-        // تشغيل الفيلم فوراً وسحب الرابط المباشر
-        function playMovie(id, title) {
+        // تشغيل الفيلم وتحديث المشغل بالأعلى
+        function playMovie(videoUrl, title, posterUrl) {
             const playerSection = document.getElementById('playerSection');
-            const iframe = document.getElementById('videoIframe');
             const titleElement = document.getElementById('playingTitle');
 
-            // استخدام سيرفر تشغيل أفلام مباشر يدعم جميع الأفلام بالـ ID
-            iframe.src = `https://vidsrc.cc/v2/embed/movie/${id}`;
             titleElement.innerText = title;
+
+            plyrInstance.source = {
+                type: 'video',
+                title: title,
+                sources: [
+                    {
+                        src: videoUrl,
+                        type: 'video/mp4'
+                    }
+                ],
+                poster: posterUrl
+            };
 
             playerSection.style.display = 'block';
             playerSection.scrollIntoView({ behavior: 'smooth' });
+            plyrInstance.play();
         }
 
-        let searchTimeout;
+        // البحث الفوري بالأفلام
         function handleSearch(e) {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
+            const query = e.target.value.trim().toLowerCase();
+            const gridTitle = document.getElementById('gridTitle');
 
-            if (query.length < 2) {
-                if(query.length === 0) loadTrendingMovies();
+            if (query === '') {
+                gridTitle.innerText = 'أحدث الأفلام والمسلسلات';
+                loadMovies();
                 return;
             }
 
-            searchTimeout = setTimeout(async () => {
-                document.getElementById('gridTitle').innerText = `نتائج البحث عن: ${query}`;
-                const grid = document.getElementById('moviesGrid');
-                grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> جاري البحث...</div>';
-
-                try {
-                    const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&language=ar-SA&query=${encodeURIComponent(query)}`);
-                    const data = await res.json();
-                    displayMovies(data.results);
-                } catch (err) {
-                    grid.innerHTML = '<div class="loading">حدث خطأ أثناء البحث.</div>';
-                }
-            }, 500);
+            gridTitle.innerText = `نتائج البحث عن: ${query}`;
+            const results = moviesList.filter(movie => movie.title.toLowerCase().includes(query));
+            loadMovies(results);
         }
     </script>
 </body>
